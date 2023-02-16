@@ -51,7 +51,7 @@ contract Strategy is Ownable, ReentrancyGuard {
         // approve and add liquidity to the stableLP and get lpTokens
         lpTokenA.approve(address(stableLP), amountA);
 
-        uint256 minMintAmount = amountA - calculatePercentage(amountA, 50);
+        uint256 minMintAmount = amountA - calculatePercentage(amountA, 50); // the default slippage percent is 0.5
         stableLP.add_liquidity([amountA, 0], minMintAmount);
 
         // approve and add lpTokens to the farm
