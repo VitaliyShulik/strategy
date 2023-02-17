@@ -2,17 +2,16 @@
 pragma solidity ^0.8.12;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./PancakeSwap/MasterChefV2.sol";
 import "./PancakeSwap/PancakeStableSwap.sol";
 import "./PancakeSwap/PancakeStableSwapFactory.sol";
 import "./PancakeSwap/interfaces/IMasterChef.sol";
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract Strategy is Ownable, ReentrancyGuard {
 
     IERC20 internal constant depositToken = IERC20(0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56); // BUSD
-    mapping(address => mapping(address => uint256)) userDepositedBalance;
+    mapping(address => mapping(address => uint256)) public userDepositedBalance;
 
     IERC20 internal constant lpTokenA = IERC20(0x55d398326f99059fF775485246999027B3197955); // USDT
     IERC20 internal constant lpTokenB = IERC20(0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d); // USDC
@@ -33,11 +32,12 @@ contract Strategy is Ownable, ReentrancyGuard {
         return address(depositToken);
     }
 
-    function deposit(uint256 amount) external onlyOwner nonReentrant {
+    function deposit(uint256 amount) external nonReentrant {
         // takes tokens as a deposit
         require(depositToken.balanceOf(msg.sender) >= amount, "Insufficient deposit token funds");
 
         userDepositedBalance[msg.sender][address(depositToken)] = amount;
+        depositToken.transferFrom(msg.sender, address(this), amount);
 
         // swap deposit toket to lpTokenA
         PancakeStableSwapFactory.StableSwapPairInfo memory pairInfo = StableSwapFactory.getPairInfo(address(depositToken), address(lpTokenA));
@@ -46,6 +46,8 @@ contract Strategy is Ownable, ReentrancyGuard {
 
         (uint256 depositTokenIndex, uint256  lpTokenAIndex) = (pairInfo.token0 == address(depositToken)) ? (0, 1) : (1, 0);
         uint256 amountA = swapContract.get_dy(depositTokenIndex, lpTokenAIndex, amount);
+
+        depositToken.approve(address(swapContract), amount);
         swapContract.exchange(depositTokenIndex, lpTokenAIndex, amount, amountA);
 
         // approve and add liquidity to the stableLP and get lpTokens
