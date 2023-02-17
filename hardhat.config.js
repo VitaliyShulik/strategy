@@ -12,12 +12,17 @@ module.exports = {
   networks: {
     bnb: {
       url: process.env.BNB_RPC,
-      accounts: [process.env.PRIVATE_KEY]
+      accounts: {
+        mnemonic: process.env.MNEMONIC
+      },
     },
     hardhat: {
       forking: {
         url: process.env.BNB_RPC,
         // blockNumber: 1000000,
+      },
+      accounts: {
+        mnemonic: process.env.MNEMONIC
       },
       allowUnlimitedContractSize: true,
     }

@@ -1,13 +1,29 @@
-# Sample Hardhat Project
+# Investing strategy smart contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+DeFi investing strategy is a smart contract that integrates with the existing yield farm.
 
-Try running some of the following tasks:
+## Preparation
 
-```shell
-npx hardhat help
+- Copy `.env.example`, rename it to `.env` and fill all constants, where:
+  - **BNB_RPC** - an url that provide possible to connect to the BSC network mainnet for tests
+  - **MNEMONIC** - a 12 or 24 word mnemonic phrase as defined by BIP39, the first address must have a minimum of 1 BUSD to pass the tests
+
+## Installation
+
+### Install dependencies
+
+```sh
+yarn
+```
+
+### Compile smart contracts
+
+```sh
+npx hardhat compile
+```
+
+### Start tests
+
+```sh
 npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
 ```
